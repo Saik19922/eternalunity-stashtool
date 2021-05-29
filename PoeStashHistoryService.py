@@ -6,7 +6,7 @@ class PoeStashHistoryService:
     def __init__(self):
         self.processingRecords = False
         self.api = PoeHttpApi("Saik1992", "Ultimatum",
-                              "77928c30c36b6dc3550737cf4d5c2c1a")
+                              "<POESESSID HERE>")
 
     def processRecords(self):
         if(self.processingRecords):
@@ -113,7 +113,7 @@ class PoeStashHistoryService:
         self.sendToDiscord(c_delta, c_add, c_rem, e_delta, e_add, e_rem)
 
     def sendToDiscord(self, c_delta, c_add, c_rem, e_delta, e_add, e_rem):
-        hookUrl = "https://discord.com/api/webhooks/848224680230125584/2UrgotYVEFVKJ8HH9qjeuXhbLfSPDNOaXElJmoWvLMfY-uPXe-ivRlCaTVl4myzKD1xS"
+        hookUrl = "<INSERT WEBHOOK HERE>"
         data = {
             "content": "Sigi's Base Currency Stats for Ultimatum\nChaos Orbs:\n\nAdded: " + str(c_add) + " | Removed: " + str(c_rem) + " | Delta: " + str(c_delta) + "\nExalted Orbs:\n\nAdded: " + str(e_add) + " | Removed: " + str(e_rem) + " | Delta: " + str(e_delta),
             "username": "Sigi Stalking Hook"
