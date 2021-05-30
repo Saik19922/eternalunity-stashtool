@@ -1,4 +1,4 @@
-from apis import poe
+from apis.poe import PoeHttpApi
 import requests
 import settings
 
@@ -6,7 +6,7 @@ class PoeStashHistoryService:
 
     def __init__(self):
         self.processingRecords = False
-        self.api = poe.PoeHttpApi("Saik1992", "Ultimatum")
+        self.api = PoeHttpApi("Saik1992", "Ultimatum")
 
     def processRecords(self):
         if(self.processingRecords):
@@ -48,22 +48,23 @@ class PoeStashHistoryService:
         while continueProcessing:
             last = loopResult["entries"][-1]
             jr = self.api.get_guildstashhistory(last["time"], last["id"])
-            if(jr == False):
+            if(jr == None):
                 print("API Limiting hit us, or some other Error occured. Trying again.")
             elif(len(jr) == 0):
                 bailoutCounter += 1
                 print(
-                    "No records recieved for processing. ({0}/6)".format(bailoutCounter))
+                    "No records recieved for processing. ({0}/3)".format(bailoutCounter))
             else:
                 loopResult = self.loopProcess(jr, lastRecordedRecord)
                 if(len(loopResult["entries"]) > 0):
                     allRecords.extend(loopResult["entries"])
                     # TODO: DB Inserts
-            if(bailoutCounter > 5):
+            if(bailoutCounter > 2):
                 continueProcessing = False
             else:
                 continueProcessing = loopResult["continueProcessing"]
 
+        # TODO: Remove this, Add actual data validation
         self.findSigi(allRecords)
 
     def loopProcess(self, responseEntries, lastRecordedRecord):
@@ -112,6 +113,7 @@ class PoeStashHistoryService:
 
         self.sendToDiscord(c_delta, c_add, c_rem, e_delta, e_add, e_rem)
 
+    # TODO: Move to discord api module
     def sendToDiscord(self, c_delta, c_add, c_rem, e_delta, e_add, e_rem):
         hookUrl = settings.DISCORDHOOK
         data = {

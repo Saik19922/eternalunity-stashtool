@@ -27,14 +27,19 @@ class PoeHttpApi:
         response = self.session.get(self.url_guild, cookies=self.ssid_cookie)
 
         # response = requests.post(url, cookies=self.ssid_cookie)
-        if response:
+        if response.ok:
             res = json.loads(response.content)["entries"]
             return res
         elif response.status_code == 429:
             print("API rate limit exceeded, waiting for {0} seconds".format(response.headers["Retry-After"]))
             time.sleep(int(response.headers["Retry-After"]))
+            return None
+        elif response.status_code == 403:
+            print('Not authorized. Update POESESSID.')
+            return None
         else:
             print("HTTP-Statuscode: ", response.status_code)
+            return None
 
     def get_guildstashhistory(self, fromEpochTime, fromId):
         url_vars = {"from": fromEpochTime, "fromId": fromId}
