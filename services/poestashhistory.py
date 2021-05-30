@@ -1,4 +1,4 @@
-from PoeHttpApi import PoeHttpApi
+from apis import poe
 import requests
 import settings
 
@@ -6,7 +6,7 @@ class PoeStashHistoryService:
 
     def __init__(self):
         self.processingRecords = False
-        self.api = PoeHttpApi("Saik1992", "Ultimatum")
+        self.api = poe.PoeHttpApi("Saik1992", "Ultimatum")
 
     def processRecords(self):
         if(self.processingRecords):
