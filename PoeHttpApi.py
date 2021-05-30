@@ -5,6 +5,7 @@ import time
 import cloudscraper
 import re
 import string
+import settings
 
 class PoeHttpApi:
     ssid_cookie = ""
@@ -12,12 +13,12 @@ class PoeHttpApi:
     league = ""
     realm = "pc"
     # change guild id in the link
-    url_guild = "https://www.pathofexile.com/api/guild/353917/stash/history"
+    url_guild = "https://www.pathofexile.com/api/guild/" + settings.GUILDID + "/stash/history"
 
-    def __init__(self, account_name, league, ssid, realm="pc"):
+    def __init__(self, account_name, league, realm="pc"):
         self.account_name = account_name
         self.league = league
-        self.ssid_cookie = {'POESESSID': ssid}
+        self.ssid_cookie = {'POESESSID': settings.POESESSID}
         self.realm = realm
         self.session = cloudscraper.create_scraper(interpreter='nodejs')
 

@@ -1,12 +1,12 @@
 from PoeHttpApi import PoeHttpApi
 import requests
+import settings
 
 class PoeStashHistoryService:
 
     def __init__(self):
         self.processingRecords = False
-        self.api = PoeHttpApi("Saik1992", "Ultimatum",
-                              "<POESESSID HERE>")
+        self.api = PoeHttpApi("Saik1992", "Ultimatum")
 
     def processRecords(self):
         if(self.processingRecords):
@@ -113,7 +113,7 @@ class PoeStashHistoryService:
         self.sendToDiscord(c_delta, c_add, c_rem, e_delta, e_add, e_rem)
 
     def sendToDiscord(self, c_delta, c_add, c_rem, e_delta, e_add, e_rem):
-        hookUrl = "<INSERT WEBHOOK HERE>"
+        hookUrl = settings.DISCORDHOOK
         data = {
             "content": "Sigi's Base Currency Stats for Ultimatum\nChaos Orbs:\n\nAdded: " + str(c_add) + " | Removed: " + str(c_rem) + " | Delta: " + str(c_delta) + "\nExalted Orbs:\n\nAdded: " + str(e_add) + " | Removed: " + str(e_rem) + " | Delta: " + str(e_delta),
             "username": "Sigi Stalking Hook"
