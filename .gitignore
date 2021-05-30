@@ -69,3 +69,6 @@ venv.bak/
 
 # Visual Studi Code
 .vscode/
+
+# SQLite DB
+development.db

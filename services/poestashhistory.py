@@ -1,4 +1,5 @@
 from apis.poe import PoeHttpApi
+from apis.db import DBApi
 import requests
 import settings
 
@@ -7,6 +8,7 @@ class PoeStashHistoryService:
     def __init__(self):
         self.processingRecords = False
         self.api = PoeHttpApi("Saik1992", "Ultimatum")
+        self.db = DBApi()
 
     def processRecords(self):
         if(self.processingRecords):
@@ -24,12 +26,9 @@ class PoeStashHistoryService:
             self.processingRecords = False
             return
 
-        lastRecordedRecord = None
+        lastRecordedRecord = self.db.findLatestRecord()
 
-        # TODO: Some DB Checks of what time/id the most recent processed transaction is
-
-        firstRun = True
-        if(firstRun):
+        if(lastRecordedRecord["id"] == None):
             # "Start from scratch", basically
             lastRecordedRecord = {"id": 0, "time": 0}
 
@@ -43,7 +42,7 @@ class PoeStashHistoryService:
 
         if(len(loopResult["entries"]) > 0):
             allRecords.extend(loopResult["entries"])
-            # TODO: DB Inserts
+            self.db.insertMany(loopResult["entries"])
 
         while continueProcessing:
             last = loopResult["entries"][-1]
@@ -58,14 +57,14 @@ class PoeStashHistoryService:
                 loopResult = self.loopProcess(jr, lastRecordedRecord)
                 if(len(loopResult["entries"]) > 0):
                     allRecords.extend(loopResult["entries"])
-                    # TODO: DB Inserts
+                    self.db.insertMany(loopResult["entries"])
+
             if(bailoutCounter > 2):
                 continueProcessing = False
             else:
                 continueProcessing = loopResult["continueProcessing"]
 
-        # TODO: Remove this, Add actual data validation
-        self.findSigi(allRecords)
+        # TODO: Add actual data validation
 
     def loopProcess(self, responseEntries, lastRecordedRecord):
         entries = []

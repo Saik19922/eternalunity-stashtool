@@ -54,7 +54,10 @@ class PoeHttpApi:
         elif response.status_code == 429:
             print("API rate limit exceeded, waiting for {0} seconds".format(response.headers["Retry-After"]))
             time.sleep(int(response.headers["Retry-After"]))
-            return False
+            return None
+        elif response.status_code == 403:
+            print('Not authorized. Update POESESSID.')
+            return None
         else:
             print("HTTP-Statuscode: ", response.status_code)
-            return False
+            return None
