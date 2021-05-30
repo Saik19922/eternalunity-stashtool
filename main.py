@@ -1,4 +1,5 @@
 from services.poestashhistory import PoeStashHistoryService
+from services.poestashanalysis import PoeStashAnalysisService
 import time
 import sys
 
@@ -9,13 +10,15 @@ def main(args=None):
     # argument parsing and overall setup here
 
     # Initializes Poe Stash Service
-    service = PoeStashHistoryService()
+    stashService = PoeStashHistoryService()
+    analysisService = PoeStashAnalysisService()
     starttime = time.time()
-    # TODO: Potentially add a Test Method to PoeStashHistoryService while in Development
     # Running Transaction processing in a loop
     while True:
-        service.processRecords()
-        time.sleep(15.0 - ((time.time() - starttime) % 15.0))
+        stashService.processRecords()
+        time.sleep(5)
+        analysisService.analyseRecords()
+        time.sleep(86400.0 - ((time.time() - starttime) % 86400.0))
 
 
 if __name__ == "__main__":

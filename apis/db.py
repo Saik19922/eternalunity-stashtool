@@ -9,13 +9,10 @@ class DBApi:
 
         # Create Table
         self.cur.execute('''CREATE TABLE IF NOT EXISTS stashDb (id INTEGER PRIMARY KEY, time INTEGER NOT NULL, action TEXT NOT NULL, item TEXT NOT NULL, account TEXT NOT NULL)''')
+        self.cur.execute('''CREATE TABLE IF NOT EXISTS memberDb (name TEXT PRIMARY KEY, chaos_delta INTEGER NOT NULL)''')
         self.con.commit()
 
-    def insert(self, entry):
-        self.cur.execute("INSERT INTO stashDb VALUES ({0}, {1}, {2}, {3}, {4})".format(int(entry["id"]), int(entry["time"]), str(entry["item"]), str(entry["action"]), str(entry["account"]["name"])))
-        self.con.commit()
-
-    def insertMany(self, entries):
+    def insertManyTransactions(self, entries):
         # Prepare data for insertion
         insertList = []
         for entry in entries:
@@ -25,9 +22,27 @@ class DBApi:
         self.cur.executemany("INSERT INTO stashDb VALUES (?, ?, ?, ?, ?)", insertList)
         self.con.commit()
 
+    def insertManyMembers(self, entries):
+        # Prepare data for insertion
+        insertList = []
+        for entry in entries:
+            insertEntry = (str(entry["account"]["name"]), 0)
+            insertList.append(insertEntry)
+
+        self.cur.executemany("INSERT OR IGNORE INTO memberDb VALUES (?, ?)", insertList)
+        self.con.commit()
+
     def findLatestRecord(self):
         self.cur.execute("select id, MAX(time) from stashDb")
         response = self.cur.fetchall()
         latestRecord = response[0]
 
         return {"id": str(latestRecord[0]), "time": str(latestRecord[1])}
+
+    def getAllMembers(self):
+        self.cur.execute("select * from memberDb")
+        return self.cur.fetchall()
+
+    def getAllTransactionsOfMember(self, member):
+        self.cur.execute("select * from stashDb where account='{0}'".format(member[0]))
+        return self.cur.fetchall()

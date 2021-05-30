@@ -42,7 +42,8 @@ class PoeStashHistoryService:
 
         if(len(loopResult["entries"]) > 0):
             allRecords.extend(loopResult["entries"])
-            self.db.insertMany(loopResult["entries"])
+            self.db.insertManyTransactions(loopResult["entries"])
+            self.db.insertManyMembers(loopResult["entries"])
 
         while continueProcessing:
             last = loopResult["entries"][-1]
@@ -57,7 +58,8 @@ class PoeStashHistoryService:
                 loopResult = self.loopProcess(jr, lastRecordedRecord)
                 if(len(loopResult["entries"]) > 0):
                     allRecords.extend(loopResult["entries"])
-                    self.db.insertMany(loopResult["entries"])
+                    self.db.insertManyTransactions(loopResult["entries"])
+                    self.db.insertManyMembers(loopResult["entries"])
 
             if(bailoutCounter > 2):
                 continueProcessing = False
