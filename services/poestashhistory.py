@@ -1,7 +1,6 @@
 from apis.poe import PoeHttpApi
 from apis.db import DBApi
-import requests
-import settings
+from apis.discord import DiscordApi
 
 class PoeStashHistoryService:
 
@@ -9,6 +8,7 @@ class PoeStashHistoryService:
         self.processingRecords = False
         self.api = PoeHttpApi("Saik1992", "Ultimatum")
         self.db = DBApi()
+        self.discord = DiscordApi()
 
     def processRecords(self):
         if(self.processingRecords):
@@ -66,6 +66,12 @@ class PoeStashHistoryService:
 
         # TODO: Add actual data validation
 
+        #if(len(allRecords) > 0):
+        #    for record in allRecords:
+        #        self.discord.sendPoeStashTransactionToDiscord(record)
+
+        self.processingRecords = False
+
     def loopProcess(self, responseEntries, lastRecordedRecord):
         entries = []
         continueProcessing = True
@@ -85,46 +91,3 @@ class PoeStashHistoryService:
             print("No more records to process, setting continueProcessing to false.")
         print("Continue processing: ", continueProcessing)
         return {"entries": entries, "continueProcessing": continueProcessing}
-
-    def findSigi(self, records):
-        e_add, e_rem, e_edit, e_delta = 0, 0, 0, 0
-        c_add, c_rem, c_edit, c_delta = 0, 0, 0, 0
-
-        for x in records:
-            if(x["account"]["name"] == "SiLeet"):
-                if(x["item"] == "Chaos Orb"):
-                    if(x["action"] == "removed"):
-                        c_rem += 1
-                    elif(x["action"] == "added"):
-                        c_add += 1
-                    elif(x["action"] == "edited"):
-                        c_edit += 1
-                elif(x["item"] == "Exalted Orb"):
-                    if(x["action"] == "removed"):
-                        e_rem += 1
-                    elif(x["action"] == "added"):
-                        e_add += 1
-                    elif(x["action"] == "edited"):
-                        e_edit += 1
-
-        c_delta = c_add - c_rem
-        e_delta = e_add - e_rem        
-
-        self.sendToDiscord(c_delta, c_add, c_rem, e_delta, e_add, e_rem)
-
-    # TODO: Move to discord api module
-    def sendToDiscord(self, c_delta, c_add, c_rem, e_delta, e_add, e_rem):
-        hookUrl = settings.DISCORDHOOK
-        data = {
-            "content": "Sigi's Base Currency Stats for Ultimatum\nChaos Orbs:\n\nAdded: " + str(c_add) + " | Removed: " + str(c_rem) + " | Delta: " + str(c_delta) + "\nExalted Orbs:\n\nAdded: " + str(e_add) + " | Removed: " + str(e_rem) + " | Delta: " + str(e_delta),
-            "username": "Sigi Stalking Hook"
-        }
-
-        result = requests.post(hookUrl, json = data)
-
-        try:
-            result.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            print(err)
-        else:
-            print("Payload delivered successfully, code {}.".format(result.status_code))
