@@ -14,6 +14,9 @@ POESESSID = os.getenv('POESESSID')
 DISCORDHOOK = os.getenv('DISCORDHOOK')
 GUILDID = os.getenv('GUILDID')
 
+#total delta threshold for alarms
+TOTALDEBT = -3
+
 #monitored items for alarms
 ANALYSEDITEMS = [
     # LvLW
@@ -25,7 +28,7 @@ ANALYSEDITEMS = [
     'Axiom Perpetuum Bronze Sceptre',
     'Redbeak Rusted Sword',
     'The Screming Eagle',
-    'The Princess'   
+    'The Princess',   
     # LvLG
     'Tabula Rasa Simple Robe',
     'Goldrim Leather Cap',
